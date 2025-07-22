@@ -13,7 +13,7 @@
             "args": "${command:pickArgs}"
         },
         {
-            "name": "Python: Debug Pytest Fixtures",
+            "name": "Python: Debug All Tests",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
@@ -21,14 +21,30 @@
                 "-v",
                 "-s",
                 "--log-cli-level=INFO",
-                "${workspaceFolder}/tests/test_event_parsing.py::test_parse_node_start_event",
-                "-k", "test_parse_node_start_event"
+                "${workspaceFolder}/tests"
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
-        }
+        },
+        {
+            "name": "Python: Debug Current Test File",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "-v",
+                "-s",
+                "--log-cli-level=INFO",
+                "${file}"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
     ]
 }

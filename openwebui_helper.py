@@ -1,7 +1,7 @@
 from typing import Optional, Dict, List, Any, AsyncGenerator
 from pydantic import BaseModel
-from .dify_client import IDifyClient, DifyAPIResponse
-from .models import Conversation, MessageContent, DifyFile
+from clients.dify_client import IDifyClient, DifyAPIResponse
+from models import Conversation, MessageContent, DifyFile
 
 class OpenWebUIHelper:
     def __init__(self, dify_client: IDifyClient, cache_dir: str = "~/.dify/cache"):
