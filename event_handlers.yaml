@@ -1,0 +1,4 @@
+workflow_finish:
+  class_name: DifyEventHandler
+  config: {}
+  module: event_management.dify_event_handler
