@@ -21,7 +21,7 @@ from event_management.event_models import (
 )
 from event_management.dify_event_handler import DifyEventHandler
 from event_management.event_emitter import EventEmitter
-from tests.mocks import (
+from tests.event_data import (
     NODE_START_EVENT_JSON,
     NODE_FINISH_LLM_JSON,
     NODE_FINISH_IF_ELSE_JSON,
@@ -29,14 +29,37 @@ from tests.mocks import (
     NODE_FINISH_TEMPLATE_TRANSFORM_JSON,
     ITERATION_FINISH_EVENT_JSON,
     WORKFLOW_FINISH_EVENT_JSON,
-    MockEventEmitter
 )
 
-# Create a test instance of DifyEventHandler
+# Fixtures
 @pytest.fixture
-def event_handler():
-    mock_emitter = MockEventEmitter(request_info_data={"test": "data"})
-    event_emitter = EventEmitter(event_emitter=mock_emitter)
+def mock_emitter():
+    class MockEventEmitter(EventEmitter):
+        def __init__(self, request_info_data):
+            self._request_info = request_info_data  # The data to be captured
+
+        async def __call__(self, event_data):
+            # In a real Open WebUI environment, this would send an event to the UI
+            print(f"Emitting event: {event_data}")
+            return event_data
+
+        @property
+        def __closure__(self):
+            # This is where the magic happens for demonstration
+            # In a real scenario, the __closure__ would be naturally created
+            # if MockEventEmitter was a nested function or had a cell object
+            # for _request_info. For demonstration, we're simulating it.
+            class Cell:
+                def __init__(self, content):
+                    self.cell_contents = content
+            return (Cell(self._request_info),)
+    
+    return MockEventEmitter
+
+@pytest.fixture
+def event_handler(mock_emitter):
+    emitter_instance = mock_emitter(request_info_data={"test": "data"})
+    event_emitter = EventEmitter(event_emitter=emitter_instance)
     return DifyEventHandler(event_emitter)
 
 # Test data
