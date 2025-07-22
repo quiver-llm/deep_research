@@ -15,7 +15,7 @@ class MessageStatus(str, Enum):
 class MessageMetadata:
     """Base metadata for all messages"""
     message_id: str
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=datetime.now)
     status: MessageStatus = MessageStatus.PENDING
     error: Optional[str] = None
     retry_count: int = 0

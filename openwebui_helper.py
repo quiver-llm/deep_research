@@ -33,8 +33,8 @@ class OpenWebUIHelper:
             conversation = Conversation(
                 id=response.data['conversation_id'],
                 title=response.data.get('title', 'New Conversation'),
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                created_at=datetime.now(),
+                updated_at=datetime.now()
             )
             self.conversations[chat_id] = conversation
             
@@ -61,7 +61,7 @@ class OpenWebUIHelper:
                 conversation = Conversation(
                     id=chunk['conversation_id'],
                     title=chunk.get('title', 'New Conversation'),
-                    created_at=datetime.utcnow(),
-                    updated_at=datetime.utcnow()
+                    created_at=datetime.now(),
+                    updated_at=datetime.now()
                 )
                 self.conversations[chat_id] = conversation

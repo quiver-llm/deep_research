@@ -69,7 +69,7 @@ class MessageProcessingSystem(System):
             processing = MessageProcessing(processor_id=str(id(self)))
             entity.add_component(processing)
         
-        processing.started_at = datetime.utcnow()
+        processing.started_at = datetime.now()
         metadata.status = MessageStatus.PROCESSING
         
         try:
@@ -78,7 +78,7 @@ class MessageProcessingSystem(System):
             
             # Update status
             metadata.status = MessageStatus.COMPLETED
-            processing.completed_at = datetime.utcnow()
+            processing.completed_at = datetime.now()
             processing.processing_time = (
                 processing.completed_at - processing.started_at
             ).total_seconds()

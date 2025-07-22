@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict, field_serializer
 from typing import Any, Dict, Optional, Type, TypeVar, Generic
 from datetime import datetime
 from enum import Enum
@@ -13,16 +13,20 @@ class MessageType(str, Enum):
 
 class BaseMessage(BaseModel):
     """Base message model that all message types should inherit from"""
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True
+    )
+    
     message_id: str
     type: MessageType
     content: Dict[str, Any]
     metadata: Dict[str, Any] = {}
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+    created_at: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('created_at')
+    def serialize_dt(self, dt: datetime, _info) -> str:
+        return dt.isoformat()
 
 # Example specific message types
 class TextMessage(BaseMessage):
