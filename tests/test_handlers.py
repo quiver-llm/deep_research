@@ -12,8 +12,8 @@ import yaml
 # we'll assume `deep_research` is the top-level package being tested.
 
 # Use absolute imports relative to the 'deep_research' package
-from tools.deep_research.event_management.event_handler_registry import EventHandlerRegistry, IEventHandler, HandlerConfig
-from tools.deep_research.event_management.handlers import DifyEventHandler, OpenWebUIEventHandler, AnotherEventHandler
+from event_management.event_handler_registry import EventHandlerRegistry, IEventHandler, HandlerConfig
+from event_management.handlers import DifyEventHandler, OpenWebUIEventHandler, AnotherEventHandler
 
 @pytest.fixture
 def config_file_path(tmp_path) -> Path:
@@ -53,17 +53,17 @@ async def test_event_handler_registry_flow(config_file_path):
         loaded_yaml_content = yaml.safe_load(f)
 
     assert "dify_chat_event" in loaded_yaml_content
-    assert loaded_yaml_content["dify_chat_event"]["module"] == "tools.deep_research.event_management.handlers"
+    assert loaded_yaml_content["dify_chat_event"]["module"] == "event_management.handlers"
     assert loaded_yaml_content["dify_chat_event"]["class_name"] == "DifyEventHandler"
     assert loaded_yaml_content["dify_chat_event"]["config"]["api_key"] == "dify_secret_key_test"
 
     assert "openwebui_message" in loaded_yaml_content
-    assert loaded_yaml_content["openwebui_message"]["module"] == "tools.deep_research.event_management.handlers"
+    assert loaded_yaml_content["openwebui_message"]["module"] == "event_management.handlers"
     assert loaded_yaml_content["openwebui_message"]["class_name"] == "OpenWebUIEventHandler"
     assert loaded_yaml_content["openwebui_message"]["config"]["user_id"] == "test_user123"
 
     assert "another_event" in loaded_yaml_content
-    assert loaded_yaml_content["another_event"]["module"] == "tools.deep_research.event_management.handlers"
+    assert loaded_yaml_content["another_event"]["module"] == "event_management.handlers"
     assert loaded_yaml_content["another_event"]["class_name"] == "AnotherEventHandler"
     assert loaded_yaml_content["another_event"]["config"]["some_param"] == "value_A"
 

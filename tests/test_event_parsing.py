@@ -15,9 +15,11 @@ from event_management.event_models import (
     NodeStartEvent,
     NodeFinishEvent,
     WorkflowFinishEvent,
-    NodeType,
-    NodeStatus,
     IterationFinishEvent
+)
+from event_management.content_models import (
+    NodeType,
+    NodeStatus
 )
 from event_management.dify_event_handler import DifyEventHandler
 from event_management.event_emitter import EventEmitter
@@ -112,9 +114,8 @@ async def test_parse_workflow_finish_event(event_handler):
     """Test parsing of workflow_finish event with specific validations."""
     event = await event_handler.handle(json.loads(WORKFLOW_FINISH_EVENT_JSON))
     assert isinstance(event, WorkflowFinishEvent)
-    # Access status from the content dictionary since WorkflowFinishEvent.content is a dict
-    assert event.content.get("status") == "succeeded"
-    assert event.content.get("total_tokens") > 0
+    assert event.content.status == "succeeded"
+    assert event.content.total_tokens > 0
 
 @pytest.mark.asyncio
 async def test_parse_invalid_event_type(event_handler):
@@ -145,7 +146,10 @@ async def test_timestamp_parsing(event_handler):
     
     # Test with workflow_finish event (datetime handling)
     wf_event = await event_handler.handle(json.loads(WORKFLOW_FINISH_EVENT_JSON))
+    assert isinstance(wf_event, WorkflowFinishEvent)
     # For workflow_finish, content is a dict with string timestamps
-    assert "finished_at" in wf_event.content
+    assert wf_event.content.finished_at is not None
     # The raw value should be preserved in the dict
-    assert isinstance(wf_event.content["finished_at"], int) or isinstance(wf_event.content["finished_at"], float)
+    assert isinstance(wf_event.content.finished_at, datetime)
+    # Verify it's timezone-aware
+    assert wf_event.content.finished_at.tzinfo == timezone.utc
