@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Dict
 
 from message_ecs.components import (
-    MessageMetadata,
+    MessageInfo,
     MessageContent,
     MessageDelivery,
     MessageProcessing,
@@ -20,10 +20,10 @@ class SuggestedQuestionsSystem(System):
         self.handler = handler
 
     def get_required_components(self) -> tuple:
-        return (MessageMetadata, MessageContent, MessageDelivery)
+        return (MessageInfo, MessageContent, MessageDelivery, MessageProcessing)
 
     def process_entity(self, entity: Entity, delta_time: float):
-        metadata = entity.get_component(MessageMetadata)
+        metadata = entity.get_component(MessageInfo)
         content = entity.get_component(MessageContent)
         delivery = entity.get_component(MessageDelivery)
         processing = entity.get_component(MessageProcessing)

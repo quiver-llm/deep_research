@@ -3,7 +3,7 @@ import asyncio
 from typing import Any, Dict, AsyncGenerator
 
 from message_ecs.systems import World
-from message_ecs.components import MessageMetadata, MessageContent, MessageDelivery, MessageProcessing, MessageStatus
+from message_ecs.components import MessageInfo, MessageContent, MessageDelivery, MessageProcessing, MessageStatus
 from message_ecs.models import MessageType
 from message_ecs.dify_systems import ChatMessageSystem, StopGenerationSystem, SuggestedQuestionsSystem
 
@@ -61,7 +61,7 @@ def test_chat_message_system(world: World, handler: MockDifyHandler):
     world.update(0.1)
 
     # Assertions
-    metadata = entity.get_component(MessageMetadata)
+    metadata = entity.get_component(MessageInfo)
     processing = entity.get_component(MessageProcessing)
     content = entity.get_component(MessageContent)
 
@@ -96,7 +96,7 @@ def test_stop_generation_system(world: World, handler: MockDifyHandler):
 
     world.update(0.1)
 
-    metadata = entity.get_component(MessageMetadata)
+    metadata = entity.get_component(MessageInfo)
     processing = entity.get_component(MessageProcessing)
 
     assert metadata.status == MessageStatus.COMPLETED
@@ -121,7 +121,7 @@ def test_suggested_questions_system(world: World, handler: MockDifyHandler):
 
     world.update(0.1)
 
-    metadata = entity.get_component(MessageMetadata)
+    metadata = entity.get_component(MessageInfo)
     processing = entity.get_component(MessageProcessing)
     content = entity.get_component(MessageContent)
 

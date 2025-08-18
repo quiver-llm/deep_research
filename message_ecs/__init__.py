@@ -6,7 +6,7 @@ messages with different content types and handling them through specialized syst
 """
 
 from message_ecs.components import (
-    MessageMetadata,
+    MessageInfo,
     MessageContent,
     MessageDelivery,
     MessageProcessing,
@@ -25,12 +25,12 @@ from message_ecs.systems import World, Entity, System, MessageProcessingSystem
 
 __all__ = [
     # Components
-    'MessageMetadata',
+    'MessageInfo',
     'MessageContent',
     'MessageDelivery',
     'MessageProcessing',
     'MessageStatus',
-    
+
     # Models
     'BaseMessage',
     'MessageType',
@@ -39,7 +39,7 @@ __all__ = [
     'CommandMessage',
     'EventMessage',
     'create_message',
-    
+
     # Systems
     'World',
     'Entity',
@@ -56,12 +56,12 @@ if __name__ == "__main__":
             print(f"Processing message: {content.data}")
             # Process the message here
             return {"status": "success"}
-    
+
     # Create world and systems
     world = World()
     client = MessageClient()
     world.add_system(MessageProcessingSystem(client))
-    
+
     # Create and process a message
     message = world.create_message_entity(
         message_type=MessageType.TEXT,
@@ -70,6 +70,6 @@ if __name__ == "__main__":
         source="system",
         priority=1
     )
-    
+
     # Update the world (processes all systems)
     world.update(0.1)

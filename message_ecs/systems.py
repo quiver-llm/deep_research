@@ -5,7 +5,7 @@ import uuid
 import time
 
 from message_ecs.components import (
-    MessageMetadata,
+    MessageInfo,
     MessageContent,
     MessageDelivery,
     MessageProcessing,
@@ -54,12 +54,13 @@ class MessageProcessingSystem(System):
         self.client = client
 
     def get_required_components(self) -> tuple:
-        return (MessageMetadata, MessageContent, MessageDelivery)
+        return (MessageInfo, MessageContent, MessageDelivery, MessageProcessing)
 
     def process_entity(self, entity: Entity, delta_time: float):
-        metadata = entity.get_component(MessageMetadata)
+        metadata = entity.get_component(MessageInfo)
         content = entity.get_component(MessageContent)
         delivery = entity.get_component(MessageDelivery)
+        processing = entity.get_component(MessageProcessing)
 
         # Basic guards: if any required component is missing, do nothing
         if not (metadata and content and delivery):
@@ -70,7 +71,6 @@ class MessageProcessingSystem(System):
             return
 
         # Ensure processing component exists
-        processing = delivery.processing
         if not processing:
             processing = MessageProcessing(processor_id=str(id(self)))
             entity.add_component(processing)
@@ -145,7 +145,7 @@ class World:
         entity = self.create_entity()
 
         # Add standard message components
-        entity.add_component(MessageMetadata(
+        entity.add_component(MessageInfo(
             message_id=str(uuid.uuid4()),
             metadata=metadata
         ))
@@ -157,8 +157,10 @@ class World:
 
         entity.add_component(MessageDelivery(
             destination=destination,
-            source=source,
-            processing=MessageProcessing(processor_id=str(uuid.uuid4()), started_at=datetime.now())
+            source=source,            
         ))
 
+        entity.add_component(MessageProcessing(
+            processor_id=str(uuid.uuid4()),
+        ))
         return entity

@@ -12,8 +12,8 @@ class MessageStatus(str, Enum):
 
 
 @dataclass
-class MessageMetadata:
-    """Base metadata for all messages"""
+class MessageInfo:
+    """Base execution information for all messages"""
     message_id: str
     timestamp: datetime = field(default_factory=datetime.now)
     status: MessageStatus = MessageStatus.PENDING
@@ -43,4 +43,3 @@ class MessageDelivery:
     priority: int = 0
     delivery_attempts: int = 0
     source: Optional[str] = None
-    processing: Optional[MessageProcessing] = None
