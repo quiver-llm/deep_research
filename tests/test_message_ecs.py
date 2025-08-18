@@ -93,6 +93,7 @@ async def test_message_processing_system(world: World, mock_client: MockClient):
         message_type=MessageType.TEXT,
         content={"text": "Test processing"},
         destination="test_dest",
+        source="test_source",
     )
 
     # Process the message
@@ -100,10 +101,15 @@ async def test_message_processing_system(world: World, mock_client: MockClient):
 
     # Check that the message was processed
     metadata = entity.get_component(MessageMetadata)
-    processing = entity.get_component(MessageProcessing)
-
+    delivery = entity.get_component(MessageDelivery)
+    processing = delivery.processing
+    assert processing is not None
     assert len(mock_client.processed_messages) == 1
     assert metadata.status == MessageStatus.COMPLETED
+    assert delivery.delivery_attempts == 1
+    assert delivery.destination == "test_dest"
+    assert delivery.source == "test_source"
+    assert processing.processor_id is not None
     assert processing.started_at is not None
     assert processing.completed_at is not None
     assert processing.processing_time > 0
@@ -162,6 +168,7 @@ def test_message_type_enum():
 def test_message_processing_system_requirements():
     system = MessageProcessingSystem(None)
     required = system.get_required_components()
+
     assert MessageMetadata in required
     assert MessageContent in required
     assert MessageDelivery in required

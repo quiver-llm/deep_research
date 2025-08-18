@@ -60,7 +60,6 @@ class MessageProcessingSystem(System):
         metadata = entity.get_component(MessageMetadata)
         content = entity.get_component(MessageContent)
         delivery = entity.get_component(MessageDelivery)
-        processing = entity.get_component(MessageProcessing)
 
         # Basic guards: if any required component is missing, do nothing
         if not (metadata and content and delivery):
@@ -69,10 +68,9 @@ class MessageProcessingSystem(System):
         # Skip if already completed or already started
         if metadata.status == MessageStatus.COMPLETED:
             return
-        if processing and processing.started_at:
-            return
 
         # Ensure processing component exists
+        processing = delivery.processing
         if not processing:
             processing = MessageProcessing(processor_id=str(id(self)))
             entity.add_component(processing)
@@ -97,7 +95,6 @@ class MessageProcessingSystem(System):
             processing.processing_time = (
                 processing.completed_at - processing.started_at
             ).total_seconds()
-
             return result
 
         except Exception as e:
@@ -160,7 +157,8 @@ class World:
 
         entity.add_component(MessageDelivery(
             destination=destination,
-            source=source
+            source=source,
+            processing=MessageProcessing(processor_id=str(uuid.uuid4()), started_at=datetime.now())
         ))
 
         return entity
