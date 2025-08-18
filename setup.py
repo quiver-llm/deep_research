@@ -42,7 +42,7 @@ setup(
             'black>=22.0',
             'flake8>=5.0.0',
             'mypy>=0.991',
-    ],
+        ],
     },
     include_package_data=True,
     entry_points={

@@ -109,6 +109,39 @@ class DifyMessageHandler(MessageHandler[AsyncGenerator[Dict[str, Any], None]]):
         except Exception as e:
             self.logger.error(f"Message processing failed: {str(e)}", exc_info=True)
             raise PipelineError(f"Failed to process message: {str(e)}") from e
+
+    async def stop_generation(self, task_id: str, user: str) -> Dict[str, Any]:
+        """Stop an ongoing streaming generation task.
+        POST /chat-messages/{task_id}/stop with body {"user": user}
+        """
+        try:
+            endpoint = f"chat-messages/{task_id}/stop"
+            payload = {"user": user}
+            self.logger.debug(f"Stopping generation for task_id={task_id} user={user}")
+            return await self.client.send_request(
+                endpoint,
+                method="POST",
+                json=payload
+            )
+        except Exception as e:
+            self.logger.error(f"Stop generation failed: {str(e)}", exc_info=True)
+            raise PipelineError(f"Failed to stop generation: {str(e)}") from e
+
+    async def get_suggested_questions(self, message_id: str, user: str) -> Dict[str, Any]:
+        """Get next suggested questions for a given message.
+        GET /messages/{message_id}/suggested?user=...
+        """
+        try:
+            endpoint = f"messages/{message_id}/suggested"
+            self.logger.debug(f"Fetching suggested questions for message_id={message_id} user={user}")
+            return await self.client.send_request(
+                endpoint,
+                method="GET",
+                params={"user": user}
+            )
+        except Exception as e:
+            self.logger.error(f"Get suggested questions failed: {str(e)}", exc_info=True)
+            raise PipelineError(f"Failed to get suggested questions: {str(e)}") from e
     
     def _build_payload(self, message: Dict[str, Any]) -> Dict[str, Any]:
         """Build the payload for the Dify API request."""
