@@ -112,7 +112,7 @@ class NodeStartContent(BaseNodeContent, WithCreatedAtMixin):
 
 class NodeFinishContent(NodeStartContent, WithFinishedAtMixin):
     """Content for node finish events."""
-    outputs: Optional[Dict[str, Any]] = None
+    outputs: Dict[str, Any] = None
     status: Optional[NodeStatus] = None
     error: Optional[str] = None
     elapsed_time: Optional[float] = None
