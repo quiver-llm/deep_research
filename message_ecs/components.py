@@ -12,8 +12,8 @@ class MessageStatus(str, Enum):
 
 
 @dataclass
-class MessageMetadata:
-    """Base metadata for all messages"""
+class MessageInfo:
+    """Base execution information for all messages"""
     message_id: str
     timestamp: datetime = field(default_factory=datetime.now)
     status: MessageStatus = MessageStatus.PENDING
@@ -28,18 +28,6 @@ class MessageContent:
     content_type: str
     data: Dict[str, Any]
 
-
-@dataclass
-class MessageDelivery:
-    """Component for tracking message delivery"""
-    destination: str
-    source: Optional[str] = None
-    priority: int = 0
-    delivery_attempts: int = 0
-    source_metadata: Optional[MessageMetadata] = None
-    source_content: Optional[MessageContent] = None
-
-
 @dataclass
 class MessageProcessing:
     """Component for tracking message processing state"""
@@ -47,3 +35,11 @@ class MessageProcessing:
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     processing_time: Optional[float] = None
+
+@dataclass
+class MessageDelivery:
+    """Component for tracking message delivery"""
+    destination: str
+    priority: int = 0
+    delivery_attempts: int = 0
+    source: Optional[str] = None
