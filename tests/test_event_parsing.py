@@ -129,7 +129,7 @@ async def test_parse_missing_required_fields(event_handler):
     # Missing content
     with pytest.raises(ValueError):
         await event_handler.handle({"type": "node_start"})
-    
+
     # Invalid content type
     with pytest.raises(ValueError):
         await event_handler.handle({"type": "node_start", "content": "not a dict"})
@@ -143,7 +143,7 @@ async def test_timestamp_parsing(event_handler):
     assert isinstance(event.content.created_at, datetime)
     # Verify it's timezone-aware
     assert event.content.created_at.tzinfo == timezone.utc
-    
+
     # Test with workflow_finish event (datetime handling)
     wf_event = await event_handler.handle(json.loads(WORKFLOW_FINISH_EVENT_JSON))
     assert isinstance(wf_event, WorkflowFinishEvent)

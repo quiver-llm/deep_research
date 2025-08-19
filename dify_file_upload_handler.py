@@ -50,8 +50,8 @@ class DifyFileUploadHandler(MessageHandler[Dict[str, Any]]):
                 # Convert bytes to file-like object
                 import io
                 return await self._upload_file_data(
-                    io.BytesIO(file_data), 
-                    file_name, 
+                    io.BytesIO(file_data),
+                    file_name,
                     user_id
                 )
 
@@ -68,14 +68,14 @@ class DifyFileUploadHandler(MessageHandler[Dict[str, Any]]):
             raise PipelineError(f"File upload failed: {str(e)}") from e
 
     async def _upload_file_data(
-        self, 
-        file_obj: BinaryIO, 
+        self,
+        file_obj: BinaryIO,
         file_name: str,
         user_id: str
     ) -> Dict[str, Any]:
         """
         Internal method to handle the actual file upload.
-    
+
         Args:
             file_obj: File-like object in binary mode
             file_name: Name of the file

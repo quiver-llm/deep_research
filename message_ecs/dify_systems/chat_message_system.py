@@ -33,8 +33,6 @@ class ChatMessageSystem(System):
 
         if metadata.status == MessageStatus.COMPLETED:
             return
-        if processing and processing.started_at:
-            return
 
         if not processing:
             processing = MessageProcessing(processor_id=str(id(self)))
