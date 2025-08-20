@@ -8,11 +8,12 @@ import aiohttp
 import mimetypes
 
 from base import MessageHandler, PipelineError
+from dify_client import DifyClient
 
 class DifyFileUploadHandler(MessageHandler[Dict[str, Any]]):
     """Handler for uploading files to Dify API."""
 
-    def __init__(self, client: 'DifyClient'):
+    def __init__(self, client: DifyClient):
         """Initialize with a DifyClient instance."""
         self.client = client
         self.logger = logging.getLogger(f"DEEP_PIPELINE.{self.__class__.__name__}")
