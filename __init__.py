@@ -13,6 +13,8 @@ from .pipeline import ResearchPipeline, create_pipeline
 from .config import get_pipeline_config, get_settings
 from .base import EventEmitter
 from .event_management.event_handler_registry import IEventHandler
+from .dify_client import DifyClient
+from .dify_file_upload_handler import DifyFileUploadHandler
 
 # Initialize logging
 settings = get_settings()
