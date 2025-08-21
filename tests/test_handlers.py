@@ -13,7 +13,8 @@ import yaml
 
 # Use absolute imports relative to the 'deep_research' package
 from event_management.event_handler_registry import EventHandlerRegistry, IEventHandler, HandlerConfig
-from event_management.handlers import DifyEventHandler, OpenWebUIEventHandler, AnotherEventHandler
+from event_management.handlers import OpenWebUIEventHandler, AnotherEventHandler  # to be deprecated
+from event_management.dify_event_handler import DifyEventHandler
 
 @pytest.fixture
 def config_file_path(tmp_path) -> Path:
@@ -53,7 +54,7 @@ async def test_event_handler_registry_flow(config_file_path):
         loaded_yaml_content = yaml.safe_load(f)
 
     assert "dify_chat_event" in loaded_yaml_content
-    assert loaded_yaml_content["dify_chat_event"]["module"] == "event_management.handlers"
+    assert loaded_yaml_content["dify_chat_event"]["module"] == "event_management.dify_event_handler"
     assert loaded_yaml_content["dify_chat_event"]["class_name"] == "DifyEventHandler"
     assert loaded_yaml_content["dify_chat_event"]["config"]["api_key"] == "dify_secret_key_test"
 

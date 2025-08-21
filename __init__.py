@@ -4,15 +4,35 @@ Dify Pipeline Integration for OpenWebUI.
 This module provides the main entry point for the Dify pipeline integration with OpenWebUI.
 """
 import logging
-from typing import Any, Dict, Optional, AsyncGenerator
+from typing import Any, Dict, Optional, AsyncGenerator, Type, TypeVar
 
 from fastapi import Request
 from pydantic import BaseModel
 
-from .pipeline import ResearchPipeline, create_pipeline
-from .config import get_pipeline_config, get_settings
-from .base import EventEmitter
-from .event_management.event_handler_registry import IEventHandler
+# Core components
+from deep_research.pipeline import ResearchPipeline, create_pipeline
+from deep_research.config import get_pipeline_config, get_settings, Settings
+from deep_research.base import EventEmitter
+
+# Event management
+from deep_research.event_management.event_handler_registry import IEventHandler, EventHandlerRegistry
+from deep_research.event_management.dify_event_handler import DifyEventHandler
+from deep_research.event_management.handlers import IWorkflowHandler, DifyWorkflowHandler
+
+# Event models
+from deep_research.event_management.event_models import (
+    NodeStartEvent,
+    NodeFinishEvent,
+    WorkflowFinishEvent,
+    IterationFinishEvent,
+    DifyEvent
+)
+
+# Content models
+from deep_research.event_management.content_models import NodeType, NodeStatus
+
+# ECS Systems
+from deep_research.message_ecs.dify_systems.workflow_run_system import WorkflowRunSystem
 
 # Initialize logging
 settings = get_settings()
@@ -89,5 +109,38 @@ async def deep_research(
         }
 
 
-# Register the tool with OpenWebUI
-__all__ = ["deep_research", "ToolInput"]
+# Export all public API components
+__all__ = [
+    # Core components
+    "ResearchPipeline",
+    "create_pipeline",
+    "get_pipeline_config",
+    "get_settings",
+    "Settings",
+    "EventEmitter",
+    
+    # Event management
+    "IEventHandler",
+    "EventHandlerRegistry",
+    "DifyEventHandler",
+    "IWorkflowHandler",
+    "DifyWorkflowHandler",
+    
+    # Event models
+    "DifyEvent",
+    "NodeStartEvent",
+    "NodeFinishEvent",
+    "WorkflowFinishEvent",
+    "IterationFinishEvent",
+    
+    # Content models
+    "NodeType",
+    "NodeStatus",
+    
+    # ECS Systems
+    "WorkflowRunSystem",
+    
+    # OpenWebUI integration
+    "deep_research",
+    "ToolInput"
+]

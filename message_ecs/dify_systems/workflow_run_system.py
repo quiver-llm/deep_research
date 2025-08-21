@@ -29,7 +29,7 @@ class WorkflowRunSystem(System):
         #   - async def execute_workflow(self, payload: Dict[str, Any]) ->
         #         - if response_mode == "streaming": AsyncGenerator[Dict[str, Any], None]
         #         - if response_mode == "blocking": Dict[str, Any]
-        self.handler = handler
+        self.handler : IWorkflowHandler = handler
 
     def get_required_components(self) -> tuple:
         return (MessageInfo, MessageContent, MessageDelivery)
