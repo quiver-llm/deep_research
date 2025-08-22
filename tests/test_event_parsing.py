@@ -36,21 +36,23 @@ from tests.event_data import (
 # Fixtures
 @pytest.fixture
 def mock_emitter():
-    class MockEventEmitter(EventEmitter):
-        def __init__(self, request_info_data):
-            self._request_info = request_info_data  # The data to be captured
+    class MockEventEmitter:
+        def __init__(self, request_info=None):
+            self._request_info = request_info or {}
+            self.emitted_events = []
 
+        async def emit(self, event_type: str, data: dict):
+            """Mock emit method that stores events for testing."""
+            self.emitted_events.append((event_type, data))
+            return data
+            
         async def __call__(self, event_data):
-            # In a real Open WebUI environment, this would send an event to the UI
-            print(f"Emitting event: {event_data}")
-            return event_data
-
+            """Allow the emitter to be called directly."""
+            return await self.emit("status", event_data)
+            
         @property
         def __closure__(self):
-            # This is where the magic happens for demonstration
-            # In a real scenario, the __closure__ would be naturally created
-            # if MockEventEmitter was a nested function or had a cell object
-            # for _request_info. For demonstration, we're simulating it.
+            """Mock closure for compatibility with EventEmitter."""
             class Cell:
                 def __init__(self, content):
                     self.cell_contents = content
@@ -60,9 +62,13 @@ def mock_emitter():
 
 @pytest.fixture
 def event_handler(mock_emitter):
-    emitter_instance = mock_emitter(request_info_data={"test": "data"})
+    emitter_instance = mock_emitter(request_info={"test": "data"})
     event_emitter = EventEmitter(event_emitter=emitter_instance)
-    return DifyEventHandler(event_emitter)
+    return DifyEventHandler(
+        api_key="test_api_key",
+        endpoint="https://api.dify.ai",
+        event_emitter=event_emitter
+    )
 
 # Test data
 TEST_EVENTS = [
