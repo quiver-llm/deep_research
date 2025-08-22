@@ -1,9 +1,9 @@
-from typing import Dict, Type, Any, Optional, List, TypeVar, Generic
+from typing import Dict, Type, Any, Optional, List, TypeVar, Generic, Iterable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
-import time
 
+from base import IComponent
 from message_ecs.components import (
     MessageInfo,
     MessageContent,
@@ -21,15 +21,94 @@ class Entity:
         self.id = entity_id or str(uuid.uuid4())
         self.components: Dict[Type[Any], Any] = {}
 
-    def add_component(self, component: Any) -> 'Entity':
+    def add_component(self, component: IComponent) -> 'Entity':
+        """Add a single component to the entity.
+
+        Args:
+            component: The component to add, must implement IComponent
+
+        Returns:
+            Self for method chaining
+        """
         self.components[type(component)] = component
         return self
 
+    def add_components(self, *components: IComponent) -> 'Entity':
+        """Add multiple components to the entity.
+
+        Args:
+            *components: One or more components to add, each must implement IComponent
+
+        Returns:
+            Self for method chaining
+        """
+        for component in components:
+            self.add_component(component)
+        return self
+
     def get_component(self, component_type: Type[T]) -> Optional[T]:
+        """Get a component by its type.
+
+        Args:
+            component_type: The type of component to retrieve
+
+        Returns:
+            The component instance if found, None otherwise
+        """
         return self.components.get(component_type)
 
     def has_component(self, component_type: Type[Any]) -> bool:
         return component_type in self.components
+
+    @classmethod
+    def create_message_entity(
+        cls,
+        message_type: MessageType,
+        content: Dict[str, Any],
+        destination: str,
+        message_id: Optional[str] = None,
+        status: MessageStatus = MessageStatus.PENDING,
+        source: Optional[str] = None,
+        **metadata
+    ) -> 'Entity':
+        """Create a new message entity with standard components.
+
+        Args:
+            message_type: Type of the message (from MessageType enum)
+            content: Dictionary containing the message data
+            destination: Destination of the message
+            message_id: Optional message ID (will be generated if not provided)
+            status: Initial status of the message
+            source: Optional source of the message
+            **metadata: Additional metadata to include in MessageInfo
+
+        Returns:
+            A new Entity instance with message components
+        """
+        entity = cls(message_id)
+
+        # Add standard message components
+        entity.add_component(MessageInfo(
+            message_id=message_id or str(uuid.uuid4()),
+            status=status,
+            metadata=metadata
+        ))
+
+        entity.add_component(MessageContent(
+            content_type=message_type.value,
+            data=content
+        ))
+
+        entity.add_component(MessageDelivery(
+            destination=destination,
+            source=source
+        ))
+
+        entity.add_component(MessageProcessing(
+            processor_id=str(uuid.uuid4())
+        ))
+
+        return entity
 
 
 class System:
@@ -44,7 +123,7 @@ class System:
         raise NotImplementedError()
 
     def process_entity(self, entity: Entity, delta_time: float):
-        """Process a single entity"""        
+        """Process a single entity"""
         raise NotImplementedError()
 
 
@@ -126,7 +205,7 @@ class World:
         for system in self.systems:
             system.process(self, delta_time)
 
-    def get_entities_with_components(self, *component_types: Type[Any]) -> List[Entity]:
+    def get_entities_with_components(self, *component_types: Type[IComponent]) -> List[Entity]:
         """Get all entities that have all the specified components"""
         return [
             entity for entity in self.entities.values()
@@ -145,22 +224,22 @@ class World:
         entity = self.create_entity()
 
         # Add standard message components
-        entity.add_component(MessageInfo(
-            message_id=str(uuid.uuid4()),
-            metadata=metadata
-        ))
+        entity.add_components(
+            MessageInfo(
+                message_id=str(uuid.uuid4()),
+                metadata=metadata
+            ),
+            MessageContent(
+                content_type=message_type.value,
+                data=content
+            ),
+            MessageDelivery(
+                destination=destination,
+                source=source,
+            ),
+            MessageProcessing(
+                processor_id=str(uuid.uuid4()),
+            )
+        )
 
-        entity.add_component(MessageContent(
-            content_type=message_type.value,
-            data=content
-        ))
-
-        entity.add_component(MessageDelivery(
-            destination=destination,
-            source=source,            
-        ))
-
-        entity.add_component(MessageProcessing(
-            processor_id=str(uuid.uuid4()),
-        ))
         return entity
